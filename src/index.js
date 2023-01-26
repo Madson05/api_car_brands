@@ -1,4 +1,5 @@
 import express from "express";
+
 import routerCars from "./routers/routerCars.js"
 
 const app = express();
@@ -7,7 +8,7 @@ const port = 3000;
 
 app.use(express.json());
 
-app.use("/cars", routerCars)
+app.use("/marcas", routerCars)
 
 
 app.listen(port, () => {

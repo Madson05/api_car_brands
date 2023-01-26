@@ -14,7 +14,7 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.get("/moreCars", async (req, res, next) => {
+router.get("/maisModelos", async (req, res, next) => {
   try {
     const data = JSON.parse(await readFile(fileName));
     let numberMax = Math.max(...data.map((car) => car.models.length));
@@ -28,7 +28,7 @@ router.get("/moreCars", async (req, res, next) => {
   }
 });
 
-router.get("/lessCars", async (req, res, next) => {
+router.get("/menosModelos", async (req, res, next) => {
   try {
     const data = JSON.parse(await readFile(fileName));
     let numberMin = Math.min(...data.map((car) => car.models.length));
@@ -43,13 +43,12 @@ router.get("/lessCars", async (req, res, next) => {
   }
 });
 
-router.get("/moreCars/:quantity", async (req, res, next) => {
+router.get("/listaMaisModelos/:x", async (req, res, next) => {
   try {
     const data = JSON.parse(await readFile(fileName));
-    const quantity = req.params.quantity;
+    const x = req.params.x;
     const lista = data
       .sort((a, b) => {
-        
         if (a.models.length > b.models.length) {
           return -1;
         } else if (a.models.length == b.models.length) {
@@ -62,16 +61,16 @@ router.get("/moreCars/:quantity", async (req, res, next) => {
       })
       .map((car) => `${car.brand} - ${car.models.length}`);
 
-    res.send(lista.slice(0, quantity));
+    res.send(lista.slice(0, x));
   } catch (error) {
     next(error);
   }
 });
 
-router.get("/lessCars/:quantity", async (req, res, next) => {
+router.get("/listaMenosModelos/:x", async (req, res, next) => {
   try {
     const data = JSON.parse(await readFile(fileName));
-    const quantity = req.params.quantity;
+    const x = req.params.x;
     const lista = data
       .sort((a, b) => {
         if (a.models.length < b.models.length) {
@@ -86,7 +85,22 @@ router.get("/lessCars/:quantity", async (req, res, next) => {
       })
       .map((car) => `${car.brand} - ${car.models.length}`);
 
-    res.send(lista.slice(0, quantity));
+    res.send(lista.slice(0, x));
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/listaModelos", async (req, res, next) => {
+  try {
+    const brand = req.body.brand;
+    if(!brand) throw new Error(`O parametro brand deve ser passado via arquivo JSON da seguinte forma: {'brand': 'marcaX'} (com aspas duplas)`)
+    const data = JSON.parse(await fs.readFile(fileName));
+    const models = data
+      .filter((car) => brand.toUpperCase() === car.brand.toUpperCase())
+      .map((car) => car.models);
+
+    res.send(models);
   } catch (error) {
     next(error);
   }
