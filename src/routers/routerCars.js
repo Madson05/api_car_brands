@@ -43,23 +43,50 @@ router.get("/lessCars", async (req, res, next) => {
   }
 });
 
-router.get("/moreCars/:number", async (req, res, next) => {
+router.get("/moreCars/:quantity", async (req, res, next) => {
   try {
     const data = JSON.parse(await readFile(fileName));
-    const lista = data.sort((a, b) => {
-      if (a.models.length > b.models.length) {
-        return -1;
-      } else if (a.models.length == b.models.length) {
-        if (a.brand < b.brand) {
+    const quantity = req.params.quantity;
+    const lista = data
+      .sort((a, b) => {
+        
+        if (a.models.length > b.models.length) {
           return -1;
-        } else {
-          return 1;
-        }
-      } else return 0;
-    }).map((car) => `${car.brand} - ${car.models.length}`)
-    
+        } else if (a.models.length == b.models.length) {
+          if (a.brand < b.brand) {
+            return -1;
+          } else {
+            return 1;
+          }
+        } else return 0;
+      })
+      .map((car) => `${car.brand} - ${car.models.length}`);
 
-    res.send(lista.slice(0,5));
+    res.send(lista.slice(0, quantity));
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/lessCars/:quantity", async (req, res, next) => {
+  try {
+    const data = JSON.parse(await readFile(fileName));
+    const quantity = req.params.quantity;
+    const lista = data
+      .sort((a, b) => {
+        if (a.models.length < b.models.length) {
+          return -1;
+        } else if (a.models.length == b.models.length) {
+          if (a.brand < b.brand) {
+            return -1;
+          } else {
+            return 1;
+          }
+        } else return 0;
+      })
+      .map((car) => `${car.brand} - ${car.models.length}`);
+
+    res.send(lista.slice(0, quantity));
   } catch (error) {
     next(error);
   }
